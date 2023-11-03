@@ -46,11 +46,12 @@ const App = () => {
           id="longitude"
           className="longitude"
           onChange={(e) => {
-            if (!isNaN(parseFloat(e.target.value))) {
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value)) {
+              setLongitude(value);
+            } else {
               setLongitude(78.48014548283436);
             }
-
-            setLongitude(parseFloat(e.target.value));
           }}
         />
         <input
@@ -58,10 +59,12 @@ const App = () => {
           id="latitude"
           className="latitude"
           onChange={(e) => {
-            if (!isNaN(parseFloat(e.target.value))) {
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value)) {
+              setLatitude(value);
+            } else {
               setLatitude(17.362464103232327);
             }
-            setLatitude(parseFloat(e.target.value));
           }}
         />
       </div>
