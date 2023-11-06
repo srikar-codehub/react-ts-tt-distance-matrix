@@ -1,25 +1,29 @@
-.map {
-  height: 90vh;
-  width: 100vw;
-  z-index: 1;
-}
-/* .latitude {
-  z-index: -1;
-}
-.longitude {
-  z-index: -1;
-} */
-
-/* body {
+body {
   display: flex;
   justify-content: center;
-} */
-
-/* .app {
-  height: 900px;
-  width: 100vh;
+}
+.App {
+  height: 700px;
+  width: 100vw;
 }
 .map {
-  height: 100%;
+  height: 90%;
   width: 100%;
-} */
+}
+.marker {
+  background-image: url("C:\Users\as78470\Desktop\ongoing\New folder\react-ts-tt-distance-matrix\public\marker.png"); /* Adjusted path */
+  background-size: cover;
+  width: 22px; /* Adjusted from 220px to match the size you initially mentioned */
+  height: 22px; /* Adjusted from 220px to match the size you initially mentioned */
+  background-color: yellow;
+  border-radius: 11px; /* Adjusted to be half of the width and height for a circular shape */
+  border: solid 3px darkslategrey;
+}
+.markerDelivery {
+  background-image: url("https://i.imgur.com/cIooqnp.png");
+  background-size: cover;
+  width: 22px;
+  height: 22px;
+  border-radius: 15px;
+  border: solid darkslategrey 3px;
+}
