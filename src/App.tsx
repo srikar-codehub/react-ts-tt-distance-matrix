@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
 import * as tt from "@tomtom-international/web-sdk-maps";
-import * as ttapi from "@tomtom-international/web-sdk-services";
+
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
 
 /////start////////
@@ -10,6 +10,51 @@ const App = () => {
   const [Map, setMap] = useState<tt.Map | null>(); //// MAP STATE
   const [longitude, setLongitude] = useState<number>(78.48014548283436);
   const [latitude, setLatitude] = useState<number>(17.362464103232327);
+  const [locationMode, setLocationMode] = useState<string>("Origins");
+  const [origins, setOrigins] = useState<Point[]>([]);
+  const [destinations, setDestinations] = useState<Point[]>([]);
+  // const [deliveryMarker, setDeliveryMarker] = useState<tt.LngLat[] | null>();
+  type Point = {
+    point: {
+      longitude: number;
+      latitude: number;
+    };
+  };
+
+  const convertToPoints = (lat: number, lng: number): Point => {
+    return {
+      point: {
+        longitude: lng,
+        latitude: lat,
+      },
+    };
+  };
+
+  const sendDataRequest = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const dataToSend = {
+      origins: origins,
+      destinations: destinations,
+    };
+    try {
+      const response = await fetch(
+        `https://api.tomtom.com/routing/matrix/2?key=${process.env.REACT_APP_TOM_TOM_API}`,
+        {
+          method: "POST",
+          body: JSON.stringify(dataToSend),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        }
+      );
+      const data = await response.json();
+      const routes = data.data;
+      console.log(data);
+      console.log(routes);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   ////USE EFFECT FOR MAP COMPONENT ON MOUNT
   /////INTIALIZE MAP/////////////
@@ -29,7 +74,7 @@ const App = () => {
         zoom: 14,
       });
 
-      ///ON LOADING MAP//////////////////
+      //////////ON LOADING MAP//////////////////
       //////////POPUP///////////
       ////////Marker///////////////
 
@@ -70,21 +115,29 @@ const App = () => {
           .addTo(mapInstance!);
       };
 
-      const destinations: tt.LngLat[] = [];
       mapInstance?.on("click", (e) => {
-        destinations.push(e.lngLat);
-
         addDeliveryMarker(e.lngLat);
+
+        const { lat, lng } = e.lngLat;
+        const point = convertToPoints(lat, lng);
+        if (locationMode === "Destinations") {
+          setDestinations((destinations) => [...destinations, point]);
+          console.log(destinations);
+        } else if (locationMode === "Origins") {
+          setOrigins((origins) => [...origins, point]);
+          console.log(origins);
+        }
       });
       return () => mapInstance?.remove();
     }
-  }, [latitude, longitude]);
+  }, [latitude, longitude, locationMode, origins, destinations]);
 
   //////HTML ELEMENTS////////////
   return (
     <>
       <div className="App">
         <div ref={mapElement} className="map"></div>
+
         <div className="searchBar">
           <h4>Enter Co-ordinates</h4>
           <input
@@ -115,6 +168,19 @@ const App = () => {
               }
             }}
           />
+          <button
+            type="button"
+            onClick={(e) => {
+              if (locationMode === "Origins") {
+                setLocationMode("Destinations");
+              } else if (locationMode === "Destinations") {
+                setLocationMode("Origins");
+              }
+            }}
+          >{`MODE:${locationMode}`}</button>
+          <button type="button" onClick={sendDataRequest}>
+            Selected all Points
+          </button>
         </div>
       </div>
     </>
